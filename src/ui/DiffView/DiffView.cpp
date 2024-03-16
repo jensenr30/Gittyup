@@ -179,13 +179,13 @@ void DiffView::setDiff(const git::Diff &diff) {
   QScrollBar *scrollBar = verticalScrollBar();
   mConnections.append(
       connect(scrollBar, &QScrollBar::valueChanged, [this](int value) {
-        if (value > verticalScrollBar()->maximum() / 2 && canFetchMore())
+        if (canFetchMore())
           fetchMore();
       }));
 
   mConnections.append(
       connect(scrollBar, &QScrollBar::rangeChanged, [this](int min, int max) {
-        if (max - min < this->widget()->height() / 2 && canFetchMore())
+        if (canFetchMore())
           fetchMore();
       }));
 
