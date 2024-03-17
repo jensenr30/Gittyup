@@ -359,6 +359,7 @@ bool DiffView::canFetchMore() {
  * use a while loop with canFetchMore() to get all
  */
 void DiffView::fetchMore(int fetchWidgets) {
+  printf("upon entering fetchMore:\n");
   bool fetchAll = fetchWidgets < 0;
 
   QVBoxLayout *layout = static_cast<QVBoxLayout *>(widget()->layout());
@@ -367,9 +368,16 @@ void DiffView::fetchMore(int fetchWidgets) {
   RepoView *view = RepoView::parentView(this);
   int addedWidgets = 0;
 
+  printf("verticalScrollBar()->maximum(): %d\n",
+         verticalScrollBar()->maximum());
+  printf("verticalScrollBar()->value(): %d\n", verticalScrollBar()->value());
+  printf("height(): %d\n", height());
+  printf("fetchWidgets: %d\n", fetchWidgets);
+  printf("fetchAll: %d\n", fetchAll);
+
   // First load all hunks of last file before loading new files
   bool fetchFiles = true;
-  if (!mFiles.isEmpty()) {
+  if (!mFiles.isEmpty() && fetchFiles) {
     FileWidget *lastFile = mFiles.last();
     // TODO stop fetching files/hunks when the file/hunk bottom was rendered
     // below height_of_diff_view * 2.0
@@ -387,10 +395,19 @@ void DiffView::fetchMore(int fetchWidgets) {
         return;
     }
 
+    printf("verticalScrollBar()->maximum(): %d\n",
+           verticalScrollBar()->maximum());
+    printf("verticalScrollBar()->value(): %d\n", verticalScrollBar()->value());
+    printf("height(): %d\n", height());
+    printf("fetchWidgets: %d\n", fetchWidgets);
+    printf("fetchAll: %d\n", fetchAll);
+
     // Stop loading files
     if (verticalScrollBar()->maximum() - verticalScrollBar()->value() >
-        height() / 2)
+        height() / 2) {
       fetchFiles = false;
+      printf("fetchFiles = %d\n", fetchFiles);
+    }
   }
 
   if (fetchFiles) {
@@ -402,13 +419,17 @@ void DiffView::fetchMore(int fetchWidgets) {
     for (auto index : indexList) {
       QList<QModelIndex> addList = mDiffTreeModel->modelIndices(index);
       for (auto add : addList) {
-        if (!indices.contains(add))
+        if (!indices.contains(add)) {
+          printf("indices.append(add)\n");
           indices.append(add);
+        }
       }
     }
     int count = indices.count();
+    printf("count = %d\n", count);
 
-    for (int i = mFiles.count(); i < count; ++i) {
+    for (int i = mFiles.count(); (i < count) && (addedWidgets < fetchWidgets);
+         ++i) {
 
       int pidx = indices[i].data(DiffTreeModel::PatchIndexRole).toInt();
       git::Patch patch = mDiff.patch(pidx);
@@ -434,7 +455,9 @@ void DiffView::fetchMore(int fetchWidgets) {
                                         name, path, submodule, widget());
       file->setStageState(state);
       mFileWidgetLayout->addWidget(file);
+      printf("addWidget\n");
       addedWidgets += file->hunks().count();
+      printf("addedWidgets = %d\n", addedWidgets);
 
       mFiles.append(file);
 
