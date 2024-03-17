@@ -371,6 +371,8 @@ void DiffView::fetchMore(int fetchWidgets) {
   bool fetchFiles = true;
   if (!mFiles.isEmpty()) {
     FileWidget *lastFile = mFiles.last();
+    // TODO stop fetching files/hunks when the file/hunk bottom was rendered
+    // below height_of_diff_view * 2.0
     while (lastFile->canFetchMore() &&
            ((verticalScrollBar()->maximum() - verticalScrollBar()->value() <
              height() / 2) ||
