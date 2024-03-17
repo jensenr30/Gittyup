@@ -177,17 +177,11 @@ void DiffView::setDiff(const git::Diff &diff) {
 
   // Load patches on demand.
   QScrollBar *scrollBar = verticalScrollBar();
-  mConnections.append(
-      connect(scrollBar, &QScrollBar::valueChanged, [this](int value) {
-        if (canFetchMore())
-          fetchMore();
-      }));
+  mConnections.append(connect(scrollBar, &QScrollBar::valueChanged,
+                              [this](int value) { fetchMore(); }));
 
-  mConnections.append(
-      connect(scrollBar, &QScrollBar::rangeChanged, [this](int min, int max) {
-        if (canFetchMore())
-          fetchMore();
-      }));
+  mConnections.append(connect(scrollBar, &QScrollBar::rangeChanged,
+                              [this](int min, int max) { fetchMore(); }));
 
   // Request comments for this diff.
   if (Repository *remoteRepo = view->remoteRepo()) {
@@ -365,16 +359,13 @@ bool DiffView::canFetchMore() {
  * use a while loop with canFetchMore() to get all
  */
 void DiffView::fetchMore(int fetchWidgets) {
+  bool fetchAll = fetchWidgets < 0;
+
   QVBoxLayout *layout = static_cast<QVBoxLayout *>(widget()->layout());
 
   // Add widgets.
   RepoView *view = RepoView::parentView(this);
   int addedWidgets = 0;
-
-  // Fetch all files
-  bool fetchAll = fetchWidgets < 0 ? true : false;
-  if (fetchWidgets < 0)
-    fetchWidgets = 4;
 
   // First load all hunks of last file before loading new files
   bool fetchFiles = true;
@@ -415,8 +406,7 @@ void DiffView::fetchMore(int fetchWidgets) {
     }
     int count = indices.count();
 
-    for (int i = mFiles.count(); i < count && addedWidgets < fetchWidgets;
-         ++i) {
+    for (int i = mFiles.count(); i < count; ++i) {
 
       int pidx = indices[i].data(DiffTreeModel::PatchIndexRole).toInt();
       git::Patch patch = mDiff.patch(pidx);
