@@ -675,6 +675,8 @@ public:
 
     // Draw graph.
     painter->save();
+
+    // Draw graph
     QVariantList columns = index.data(CommitList::Role::GraphRole).toList();
     QVariantList colorColumns =
         index.data(CommitList::Role::GraphColorRole).toList();
@@ -695,9 +697,9 @@ public:
 
       // ys
       int y1 = y + h_2 - r;
-      int y2 = y + h_2;
+      int y2 = y + h_2; // ellipse
       int y3 = y + h_2 + r;
-      int y4 = y + h_2 + h_4;
+      int y4 = y + h_2 + h_4 + h_4;
       int y5 = y + h;
 
       QVariantList segments = columns.at(i).toList();
@@ -729,9 +731,9 @@ public:
             painter->drawLine(x1, y3, x1, y5);
             break;
 
-          case Cross:
-            painter->drawLine(x, y4, x2, y4);
-            break;
+            // case Cross:
+            //   painter->drawLine(x, y4, x2, y4);
+            //   break;
 
           case RightOut: {
             QPainterPath path;
